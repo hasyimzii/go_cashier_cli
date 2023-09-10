@@ -9,9 +9,9 @@ import (
 )
 
 func ProductMenu() {
-	fmt.Println("[1] Product List")
-	fmt.Println("[2] Add Product")
-	fmt.Println("[3] Edit Product")
+	fmt.Println("[1] All Products")
+	fmt.Println("[2] Create Product")
+	fmt.Println("[3] Update Product")
 	fmt.Println("[4] Remove Product")
 	fmt.Println("[0] Back")
 
@@ -19,11 +19,11 @@ func ProductMenu() {
 
 	switch controllers.Input {
 	case "1":
-		ProductList()
+		AllProducts()
 	case "2":
-		AddProduct()
+		CreateProduct()
 	case "3":
-		EditProduct()
+		UpdateProduct()
 	case "4":
 		RemoveProduct()
 	case "0":
@@ -34,49 +34,74 @@ func ProductMenu() {
 	}
 }
 
-func ProductList() {
+func AllProducts() {
 	controllers.GetProduct()
 
 	controllers.UserInput("[Press enter to go back] ", &controllers.Input)
+
+	ProductMenu()
 }
 
-func AddProduct() {
-	// TODO: Bikin add
+func CreateProduct() {
+	var code, name, price, stock string
+
+	fmt.Println("Type on every field")
+	fmt.Print("Product code: ")
+	fmt.Scanln(&code)
+	fmt.Print("Product name: ")
+	fmt.Scanln(&name)
+	fmt.Print("Product price: ")
+	fmt.Scanln(&price)
+	fmt.Print("Product stock: ")
+	fmt.Scanln(&stock)
+
+	controllers.ClearScreen()
+
+	if code == "" || name == "" || price == "" || stock == "" {
+		fmt.Println("[Alert: Field cannot be empty!]")
+	} else {
+		err := controllers.PostProduct(code, name, price, stock)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+
+	ProductMenu()
 }
 
-func EditProduct() {
+func UpdateProduct() {
 	controllers.GetProduct()
 
 	controllers.UserInput("Type product code to edit: ", &controllers.Input)
 
-	index, err := controllers.FindProductIndex(controllers.Input)
+	var index int
+	var err error
+	index, err = controllers.FindProductIndex(controllers.Input)
 	if err != nil {
 		fmt.Println(err)
 		ProductMenu()
+		return
 	}
 
-	var name string = models.Products[index].Name
-	var price string = strconv.FormatInt(models.Products[index].Price, 10)
-	var stock string = strconv.FormatInt(models.Products[index].Stock, 10)
+	var product models.Product = controllers.FindProductModel(index)
+	var name, price, stock string
 
-	var nameInput string
-	var priceInput int64
-	var stockInput int64
-
-	// FIXME: update input benerin
 	fmt.Println("Type on the field you want to edit (Press enter to skip)")
-	fmt.Printf("Product name (%v): ", name)
-	fmt.Scan(nameInput)
-	fmt.Printf("Price (Rp %v): ", price)
-	fmt.Scan(priceInput)
-	fmt.Printf("Stock (%v): ", stock)
-	fmt.Scan(stockInput)
+	fmt.Print("Product name (" + product.Name + "): ")
+	fmt.Scanln(&name)
+	fmt.Printf("Price (Rp " + strconv.Itoa(product.Price) + "): ")
+	fmt.Scanln(&price)
+	fmt.Printf("Stock (" + strconv.Itoa(product.Stock) + "): ")
+	fmt.Scanln(&stock)
 
-	fmt.Println(models.Product{
-		Name:  nameInput,
-		Price: priceInput,
-		Stock: stockInput,
-	})
+	controllers.ClearScreen()
+
+	err = controllers.PutProduct(index, name, price, stock)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	ProductMenu()
 }
 
 func RemoveProduct() {
@@ -91,4 +116,6 @@ func RemoveProduct() {
 	}
 
 	controllers.DeleteProduct(index)
+
+	ProductMenu()
 }

@@ -7,7 +7,7 @@ import (
 )
 
 func SortProductAsc() {
-	sort.Slice(models.Products, func(i, j int) bool {
-		return models.Products[i].Code < models.Products[j].Code
+	sort.Slice(models.ProductList, func(i, j int) bool {
+		return models.ProductList[i].Code < models.ProductList[j].Code
 	})
 }

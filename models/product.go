@@ -3,11 +3,11 @@ package models
 type Product struct {
 	Code  string
 	Name  string
-	Price int64
-	Stock int64
+	Price int
+	Stock int
 }
 
-var Products = []Product{
+var ProductList = []Product{
 	{
 		Code:  "A01",
 		Name:  "Fitness Gizmo",
